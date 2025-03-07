@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Bar, Line } from "react-chartjs-2";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
@@ -63,7 +63,6 @@ const Data4 = () => {
     const uploadedDataRef = collection(db, "uploadedDataEmployee");
     const snapshot = await getDocs(uploadedDataRef);
     let uploadedData = snapshot.docs.map((doc) => doc.data());
-    
   
     if (department && department.value) {
       uploadedData = uploadedData.filter((item) => item.Department === department.value);
