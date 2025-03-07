@@ -22,7 +22,12 @@ import EmployeeStats from './EmployeeStats';
 import TimesheetPage from './TimesheetPage'; 
 import RegisterMetricsEng from './RegisterMetricsEng'; 
 import UsersPage from './UsersPage'; 
-import UserDetailPage from './UserDetailPage'; 
+import UserDetailPage from './UserDetailPage';
+import UserPageStandup from './UserPageStandup'; 
+import UserDetailPageStandup from './UserDetailPageStandup';
+
+
+ 
 
 
 
@@ -54,8 +59,11 @@ const App = () => {
         <Route path="/timesheetPage" element={<TimesheetPage />} />
         <Route path="/registerMetricsEng" element={<RegisterMetricsEng />} />
         <Route path="/usersPage" element={<UsersPage />} />
+        <Route path="/userPageStandup" element={<UserPageStandup />} />
+        
       
         <Route path="/users/:userId" element={<UserDetailPage />} />
+        <Route path="/users_standup/:userId" element={<UserDetailPageStandup />} />
         
         
         
