@@ -541,22 +541,42 @@ const getActivityTimelineData = () => {
         {/* Trackify and Standup details Links */}
         <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <h3 className="text-lg font-semibold text-gray-800">User Activity</h3>
+              <h3 className="text-lg font-semibold text-gray-800">Productivity all employees</h3>
               <div className="flex gap-3">
                 <Link 
                   to="/data3" 
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                 >
-                  Trackify Details
+                  Trackify
                 </Link>
                 <Link 
                   to="/data" 
                   className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
                 >
-                  Standup Details
+                  Standup
                 </Link>
               </div>
             </div>
+            <br/>
+          {/* per employee */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <h3 className="text-lg font-semibold text-gray-800">Productivity per employee</h3>
+              <div className="flex gap-3">
+                <Link 
+                  to="/usersPage" 
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                >
+                  Trackify
+                </Link>
+                <Link 
+                  to="/userPageStandup" 
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                >
+                  Standup
+                </Link>
+              </div>
+            </div>
+            
           </div>
 
        {/* Filters Section */}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { Helmet } from "react-helmet";
 
 const UserPageStandup = () => {
   const [users, setUsers] = useState([]);
@@ -8,6 +9,15 @@ const UserPageStandup = () => {
   const [locationFilter, setLocationFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Agrega esto antes del useEffect
+  const locationColors = {
+    Peru: 'bg-blue-100 text-blue-800',
+    Nepal: 'bg-green-100 text-green-800',
+    USA: 'bg-red-100 text-red-800',
+    Other: 'bg-gray-100 text-gray-800'
+  };
+
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -29,15 +39,23 @@ const UserPageStandup = () => {
     fetchUsers();
   }, [statusFilter, locationFilter]);
 
-  const clearFilters = () => {
-    setStatusFilter('all');
-    setLocationFilter('all');
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
+      <Link to="/data4" className="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-6">
+          <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back
+        </Link>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Employee productivity - Standup</title>
+      </Helmet>
+      
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">User Management</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Employee productivity - Standup</h1>
         
         {/* Filter Section */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
@@ -49,7 +67,7 @@ const UserPageStandup = () => {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               >
-                <option value="all">All Statuses</option>
+                <option value="all">All</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
@@ -62,7 +80,7 @@ const UserPageStandup = () => {
                 onChange={(e) => setLocationFilter(e.target.value)}
                 className="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               >
-                <option value="all">All Locations</option>
+                <option value="all">All</option>
                 <option value="Peru">Peru</option>
                 <option value="USA">USA</option>
                 <option value="Nepal">Nepal</option>
@@ -70,12 +88,7 @@ const UserPageStandup = () => {
             </div>
 
             <div className="flex items-end">
-              <button
-                onClick={clearFilters}
-                className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Clear Filters
-              </button>
+              
             </div>
           </div>
         </div>
@@ -125,11 +138,12 @@ const UserPageStandup = () => {
                         {user.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <div className="flex items-center">
-                        <span className="mr-2">🌎</span>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        locationColors[user.location] || 'bg-gray-100 text-gray-800'
+                      }`}>
                         {user.location}
-                      </div>
+                      </span>
                     </td>
                   </tr>
                 ))}

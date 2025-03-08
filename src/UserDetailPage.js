@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import { Helmet } from "react-helmet";
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, 
          Title, Tooltip, Legend, ArcElement, PointElement, LineElement } from 'chart.js';
@@ -180,6 +181,7 @@ const UserDetailPage = () => {
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 10;
+  
 
 // Agrega estas funciones utilitarias
 const formatLocalTime = (utcString) => {
@@ -217,6 +219,7 @@ const formatLocalTime = (utcString) => {
         setLoading(true);
         const response = await axios.get(
           `https://api-trackify-user.vercel.app/api/v1/timesheets/${userId}`
+          
         );
         
         if (!response.data.data?.length) {
@@ -227,6 +230,8 @@ const formatLocalTime = (utcString) => {
           time_from: entry.time_from || null,
           time_to: entry.time_to || null,
           duration: entry.duration || '00:00:00',
+       
+          
           ...entry
         })));
       } catch (err) {
@@ -287,16 +292,46 @@ const getPaginatedData = () => {
       </Link>
       
       <div className="bg-white rounded-xl shadow-sm p-6 lg:p-8">
+     
       <header className="mb-8">
-  <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
-  Productivity Report - {userData[0]?.user_name || 'Usuario desconocido'}
-  </h1>
-  <p className="text-gray-500 mt-2">
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Employee productivity - Trackify</title>
+      </Helmet>
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
+        Productivity Report | Trackify - {userData[0]?.user_name || 'Usuario desconocido'}
+        </h1>
+
+ {/* Status y Location */}
+ <div className="flex items-center gap-4 mt-3">
+      <div className="flex items-center gap-2">
+        <span className={`inline-block w-2 h-2 rounded-full ${
+          userData[0]?.status === 'active' ? 'bg-green-500' : 'bg-red-500'
+        }`}></span>
+        <span className="text-sm font-medium text-gray-600 capitalize">
+          {userData[0]?.status || 'No status'}
+        </span>
+      </div>
+      <div className="flex items-center gap-2">
+        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        <span className="text-sm text-gray-600">
+          {userData[0]?.location || 'Remote'}
+        </span>
+      </div>
+    
+
+    <span className="text-sm text-gray-600">•</span>
+    <span className="text-sm text-gray-600">
     {userData.length} found records • Last activity: {' '}
     {new Date(getLatestActivity(userData)).toLocaleDateString('en-US', {
       day: 'numeric', month: 'long', year: 'numeric'
     })}
-  </p>
+  </span>
+  </div>
+  
 </header>
 
         <Dashboard userData={userData} />
@@ -304,7 +339,7 @@ const getPaginatedData = () => {
    
 <section className="mt-10">
   <div className="flex justify-between items-center mb-4">
-    <h2 className="text-xl font-semibold">Detalle de Registros</h2>
+    <h2 className="text-xl font-semibold">Detail Records</h2>
     
     {/* Controles de paginación */}
     <div className="flex items-center gap-2">
@@ -313,11 +348,11 @@ const getPaginatedData = () => {
         disabled={currentPage === 0}
         className="px-3 py-1 text-sm bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Anterior
+        Previous
       </button>
       
       <span className="text-sm text-gray-600">
-        Página {currentPage + 1} de {Math.ceil(userData.length / itemsPerPage)}
+        Page {currentPage + 1} de {Math.ceil(userData.length / itemsPerPage)}
       </span>
       
       <button
@@ -327,7 +362,7 @@ const getPaginatedData = () => {
         disabled={currentPage >= Math.ceil(userData.length / itemsPerPage) - 1}
         className="px-3 py-1 text-sm bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Siguiente
+        Next
       </button>
     </div>
   </div>
@@ -335,8 +370,8 @@ const getPaginatedData = () => {
   <div className="space-y-3">
     {getPaginatedData().map((entry, index) => {
       const originalIndex = currentPage * itemsPerPage + index + 1;
-      const timeFrom = entry.time_from?.slice(11,16) || '--:--';
-      const timeTo = entry.time_to?.slice(11,16) || '--:--';
+      //const timeFrom = entry.time_from?.slice(11,16) || '--:--';
+      //const timeTo = entry.time_to?.slice(11,16) || '--:--';
       
       return (
         <div key={`${currentPage}-${index}`} className="bg-gray-50 p-4 rounded-lg flex justify-between items-center">
@@ -376,7 +411,7 @@ const getPaginatedData = () => {
   <div className="mt-4 flex justify-end">
     <div className="flex items-center gap-2">
       <span className="text-sm text-gray-600">
-        Mostrando {getPaginatedData().length} de {userData.length} registros
+      Showing {getPaginatedData().length} of {userData.length} records
       </span>
       <select
         value={currentPage}
@@ -385,12 +420,14 @@ const getPaginatedData = () => {
       >
         {Array.from({ length: Math.ceil(userData.length / itemsPerPage) }).map((_, i) => (
           <option key={i} value={i}>
-            Página {i + 1}
+            Page {i + 1}
           </option>
         ))}
       </select>
     </div>
   </div>
+
+  
 </section>
       </div>
     </div>
