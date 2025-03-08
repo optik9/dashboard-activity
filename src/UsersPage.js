@@ -66,6 +66,10 @@ const UsersPage = () => {
     }));
   };
 
+  const sortedUsers = [...users].sort((a, b) => 
+    a.user_name.localeCompare(b.user_name)
+  );
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <Link to="/data4" className="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-6">
@@ -152,7 +156,7 @@ const UsersPage = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {users.map(user => (
+                {sortedUsers.map(user => (
                   <tr key={user.id_user} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       #{user.id_user}
