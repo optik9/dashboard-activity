@@ -66,7 +66,9 @@ const Data4 = () => {
     
   
     if (department && department.value) {
-      uploadedData = uploadedData.filter((item) => item.Department === department.value);
+      uploadedData = uploadedData.filter((item) => item.Department === department.value && Number(item.Active) === 1 // ← Mayúscula 
+    
+    );
     }
     
     setUploadedDataEmployee(uploadedData);
@@ -342,8 +344,10 @@ const handleDepartmentChange = (selectedOption) => {
   const totalCommits = standupData.reduce((acc, item) => acc + (item.commit_count || 0), 0);
   const totalTasks = standupData.reduce((acc, item) => acc + (item.task_count || 0), 0);
 
-  // Calcular número total de usuarios en uploadedDataEmployee
-  const totalUploadedUsers = uploadedDataEmployee.length;
+ // Calcular número total de usuarios en uploadedDataEmployee con active = 1
+  const totalUploadedUsers = uploadedDataEmployee.filter(
+    user => user?.Active !== undefined && Number(user.Active) === 1
+  ).length;
 
   // Calcular número total de usuarios únicos en Trackify
   const uniqueTrackifyUsers = [...new Set(trackifyData.map((item) => item.user_name))].length;
@@ -622,7 +626,8 @@ const getActivityTimelineData = () => {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         {[
-          { title: "Total Employees", value: totalUploadedUsers, color: "bg-purple-100", textColor: "text-purple-600" },
+          { title: "Total Employees", value: uploadedDataEmployee.filter(user => Number(user?.Active) === 1).length,
+            color: "bg-purple-100", textColor: "text-purple-600" },
           { 
             title: "Trackify Records", 
             value: uniqueTrackifyUsers, 
@@ -647,8 +652,9 @@ const getActivityTimelineData = () => {
             <div className="flex items-baseline gap-2">
               <p className={`text-3xl font-bold ${card.textColor}`}>{card.value}</p>
               <span className={`text-sm ${getPercentageColor(card.percentage)}`}>
-                ({card.percentage}% de {card.total})
+                {card.percentage ? `(${card.percentage}% of ${card.total})` : ''}
               </span>
+              
             </div>
           </div>
         ))}
