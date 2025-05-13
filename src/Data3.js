@@ -12,9 +12,10 @@ const getDatesInRange = (startDate, endDate) => {
   
   while (start <= end) {
     const dayOfWeek = start.getDay();
-    // Excluir sábado (6) y domingo (0)
     if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-      dates.push(new Date(start).toLocaleDateString());
+      // Formato ISO para comparaciones consistentes
+      const isoDate = `${start.getFullYear()}-${(start.getMonth() + 1).toString().padStart(2, '0')}-${start.getDate().toString().padStart(2, '0')}`;
+      dates.push(isoDate);
     }
     start.setDate(start.getDate() + 1);
   }
@@ -74,12 +75,14 @@ const Data3 = () => {
       // Calculate users with missing days
       const userDateMap = new Map();
       filteredTimesheets.forEach((item) => {
-        //const date = new Date(item.time_from).toLocaleDateString();
-        const date = new Date(item.createdAt).toLocaleDateString();
+        const date = new Date(item.createdAt);
+        // Formatear a ISO (YYYY-MM-DD) para consistencia
+        const isoDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+        
         if (!userDateMap.has(item.user_name)) {
           userDateMap.set(item.user_name, new Set());
         }
-        userDateMap.get(item.user_name).add(date);
+        userDateMap.get(item.user_name).add(isoDate);
       });
 
       const missingDaysData = mandatoryEmployees.map((user) => {
@@ -336,12 +339,32 @@ const Data3 = () => {
                   {usersMissingDays.map((userData, index) => (
                     <tr key={index} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 text-sm text-gray-600">{index + 1}</td>
-                      <td className="px-6 py-4 text-sm font-medium text-purple-600">
+                      <td className="px-6 py-4 text-sm font-medium text-red-600">
                         {userData.user}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
-                        {userData.missingDates.join(', ')}
-                      </td>
+              <div className="flex flex-wrap gap-2">
+                {userData.missingDates.map((date, i) => {
+                  const dateObj = new Date(date);
+                  return (
+                    <div key={i} className="bg-gray-50 p-2 rounded-lg shadow-sm border border-gray-200">
+                      <div className="flex flex-col items-start">
+                        <span className="font-semibold text-blue-600 text-xs uppercase tracking-wide">
+                          {dateObj.toLocaleDateString('en-US', { weekday: 'long' })}
+                        </span>
+                        <span className="text-gray-600 text-sm">
+                          {dateObj.toLocaleDateString('en-US', {
+                            month: 'numeric',
+                            day: 'numeric',
+                            year: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </td>
                       <td className="px-6 py-4 text-sm font-medium text-red-600">
                         {userData.count} days
                       </td>

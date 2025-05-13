@@ -29,6 +29,7 @@ const EmployeeStats = () => {
   const [goal, setGoal] = useState(97.22);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [range, setRange] = useState('YTD');
 
   const groupedMonths = useMemo(() => {
     if (data.length === 0) return [];
@@ -144,6 +145,12 @@ const EmployeeStats = () => {
     standup: 0 
   };
 
+  const filteredData = useMemo(() => {
+    if (range === 'YTD') return data;
+    const months = range === '3M' ? 3 : 6;
+    return data.slice(-months * 4); // asumiendo 4 semanas por mes
+  }, [data, range]);
+
   // Loading and Error States
   if (isLoading) {
     return (
@@ -222,6 +229,53 @@ const EmployeeStats = () => {
     </div>
   );
 
+  // Colores fijos para cada métrica
+  const COLORS = {
+    trackify: "#2563eb", // azul
+    standup: "#f59e42",  // naranja
+    goal: "#64748b"      // gris
+  };
+
+  // Tooltip personalizado
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div style={{
+          background: "#fff",
+          border: "1px solid #e2e8f0",
+          borderRadius: 8,
+          padding: 12,
+          boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
+        }}>
+          <div style={{ fontWeight: 600, marginBottom: 4 }}>{label}</div>
+          {payload.map((entry, idx) => (
+            <div key={idx} style={{ color: entry.color, fontWeight: 500 }}>
+              {entry.name}: {entry.value.toFixed(2)}%
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Puntos personalizados para cada línea
+  const TrackifyDot = (props) => {
+    const { cx, cy, index } = props;
+    if (index === filteredData.length - 1) {
+      return <circle cx={cx} cy={cy} r={8} fill={COLORS.trackify} stroke="#fff" strokeWidth={3} />;
+    }
+    return <circle cx={cx} cy={cy} r={4} fill={COLORS.trackify} />;
+  };
+
+  const StandupDot = (props) => {
+    const { cx, cy, index } = props;
+    if (index === filteredData.length - 1) {
+      return <circle cx={cx} cy={cy} r={8} fill={COLORS.standup} stroke="#fff" strokeWidth={3} />;
+    }
+    return <circle cx={cx} cy={cy} r={4} fill={COLORS.standup} />;
+  };
+
   return (
     <div className="dashboard-container">
         {/* Header Section */}
@@ -287,69 +341,82 @@ const EmployeeStats = () => {
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-slate-800">Performance Trend</h3>
           <div className="flex gap-2">
-            <button className="text-slate-600 hover:bg-slate-50 px-3 py-1 rounded-lg text-sm font-medium transition-colors">
+            <button
+              className={`px-3 py-1 rounded-lg text-sm font-medium ${range === '3M' ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              onClick={() => setRange('3M')}
+            >
               3M
             </button>
-            <button className="text-slate-600 hover:bg-slate-50 px-3 py-1 rounded-lg text-sm font-medium transition-colors">
+            <button
+              className={`px-3 py-1 rounded-lg text-sm font-medium ${range === '6M' ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              onClick={() => setRange('6M')}
+            >
               6M
             </button>
-            <button className="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-sm font-medium">
+            <button
+              className={`px-3 py-1 rounded-lg text-sm font-medium ${range === 'YTD' ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              onClick={() => setRange('YTD')}
+            >
               YTD
             </button>
           </div>
         </div>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
+            <LineChart data={filteredData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis 
                 dataKey="week" 
                 stroke="#64748b"
                 tick={{ fill: '#475569', fontSize: 12 }}
+                interval={0}
+                angle={-30}
+                textAnchor="end"
+                height={60}
               />
               <YAxis 
                 domain={[0, 100]} 
                 stroke="#64748b"
                 tick={{ fill: '#475569', fontSize: 12 }}
               />
-              <Tooltip 
-                contentStyle={{
-                  background: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                }}
-              />
+              <Tooltip content={<CustomTooltip />} />
               <Legend 
                 wrapperStyle={{ paddingTop: '20px' }}
                 formatter={(value) => (
-                  <span className="text-slate-600 text-sm font-medium">{value}</span>
+                  <span style={{
+                    color: COLORS[value] || "#64748b",
+                    fontWeight: 600,
+                    fontSize: 14
+                  }}>
+                    {value.charAt(0).toUpperCase() + value.slice(1)}
+                  </span>
                 )}
               />
               <Line 
                 type="monotone" 
                 dataKey="trackify" 
                 name="Trackify" 
-                stroke={getValueColor(currentWeek.trackify)}
+                stroke={COLORS.trackify}
                 strokeWidth={2}
-                dot={{ fill: getValueColor(currentWeek.trackify), strokeWidth: 2 }}
+                dot={TrackifyDot}
               />
               <Line 
                 type="monotone" 
                 dataKey="standup" 
                 name="Standup" 
-                stroke={getValueColor(currentWeek.standup)}
+                stroke={COLORS.standup}
                 strokeWidth={2}
-                dot={{ fill: getValueColor(currentWeek.standup), strokeWidth: 2 }}
+                dot={StandupDot}
               />
               <Line 
                 type="monotone" 
                 dataKey="goal" 
                 name="Goal" 
-                stroke="#475569" 
+                stroke={COLORS.goal} 
                 strokeDasharray="5 5"
                 strokeOpacity={0.6}
                 strokeWidth={1.5}
+                dot={false}
               />
             </LineChart>
           </ResponsiveContainer>

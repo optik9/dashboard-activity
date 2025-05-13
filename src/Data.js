@@ -364,10 +364,27 @@ const fetchUploadedEmployees = async () => {
                   <td className="px-6 py-4 text-sm text-gray-600">{index + 1}</td>
                   <td className="px-6 py-4 text-sm font-medium text-red-600">{userData.user}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">
-                    {userData.missingDates.map(date => 
-                      format(parseISO(date), 'MM/dd/yyyy')).join(', ')
-                    }
-                  </td>
+              <div className="flex flex-wrap gap-2">
+                {userData.missingDates.map((date, dateIndex) => {
+                  const parsedDate = parseISO(date);
+                  return (
+                    <div 
+                      key={`${index}-${dateIndex}`}
+                      className="bg-gray-50 p-2 rounded-lg border border-gray-200 shadow-sm"
+                    >
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs font-semibold text-blue-600 uppercase tracking-wide">
+                          {format(parsedDate, 'EEEE')}
+                        </span>
+                        <span className="text-sm text-gray-600">
+                          {format(parsedDate, 'MM/dd/yyyy')}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </td>
                   <td className="px-6 py-4 text-sm font-medium text-red-600">{userData.count} days</td>
                 </tr>
               ))}

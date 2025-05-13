@@ -25,11 +25,9 @@ import UsersPage from './UsersPage';
 import UserDetailPage from './UserDetailPage';
 import UserPageStandup from './UserPageStandup'; 
 import UserDetailPageStandup from './UserDetailPageStandup';
-
-
- 
-
-
+import RecruitmentDashboard from './RecruitmentDashboard';
+import RecruitmentDashboardForm from './RecruitmentDashboardForm';
+import RecruitmentMetricsDashboard from './RecruitmentMetricsDashboard';
 
 
 
@@ -60,6 +58,12 @@ const App = () => {
         <Route path="/registerMetricsEng" element={<RegisterMetricsEng />} />
         <Route path="/usersPage" element={<UsersPage />} />
         <Route path="/userPageStandup" element={<UserPageStandup />} />
+        <Route path="/recruitmentDashboard" element={<RecruitmentDashboard />} />
+        <Route path="/recruitmentDashboardForm" element={<RecruitmentDashboardForm />} />
+        <Route path="/recruitment-metrics" element={<RecruitmentMetricsDashboard />} />
+        
+
+        
         
       
         <Route path="/users/:userId" element={<UserDetailPage />} />
